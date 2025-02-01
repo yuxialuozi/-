@@ -1,4 +1,4 @@
-package model2
+package model
 
 // Comment 评论表 /*
 type Comment struct {

@@ -1,4 +1,4 @@
-package model2
+package model
 
 // Favorite 点赞表 /*
 type Favorite struct {

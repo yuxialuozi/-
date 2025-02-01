@@ -5,7 +5,7 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gorm"
 	"simpledouyin/config"
-	"simpledouyin/model2"
+	"simpledouyin/model"
 )
 
 // Querier Dynamic SQL
@@ -24,11 +24,11 @@ func main() {
 	gormdb, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	g.UseDB(gormdb)
 
-	// Generate basic type-safe DAO API for struct `model2.User` following conventions
-	g.ApplyBasic(model2.UserToken{}, model2.Video{}, model2.User{}, model2.Comment{}, model2.Relation{}, model2.Favorite{})
+	// Generate basic type-safe DAO API for struct `model.User` following conventions
+	g.ApplyBasic(model.UserToken{}, model.Video{}, model.User{}, model.Comment{}, model.Relation{}, model.Favorite{})
 
 	// Generate Type Safe API with Dynamic SQL defined on Querier interface
-	g.ApplyInterface(func(Querier) {}, model2.UserToken{}, model2.Video{}, model2.User{}, model2.Comment{})
+	g.ApplyInterface(func(Querier) {}, model.UserToken{}, model.Video{}, model.User{}, model.Comment{})
 
 	// Generate the code
 	g.Execute()

@@ -1,4 +1,4 @@
-package model2
+package model
 
 // UserToken 用户令牌儿表 /*
 type UserToken struct {

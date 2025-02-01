@@ -1,4 +1,4 @@
-package model2
+package model
 
 // Relation 关系表 /*
 type Relation struct {
