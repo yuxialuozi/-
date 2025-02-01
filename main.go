@@ -1,37 +1,85 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"simpledouyin/Router"
-	"simpledouyin/config"
-	"simpledouyin/logging"
-	"simpledouyin/migrations" // 引入 migrations 包
-	"simpledouyin/service"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"google.golang.org/grpc"
+	"log"
+	"net"
+	"simpledouyin/constants" // 导入数据库常量配置
+	"simpledouyin/generated/douyin/auth"
+	server "simpledouyin/service"
 )
 
-func main() {
-	// 初始化日志配置
-	logging.Init()
+// 启动 gRPC 服务器
+func startGRPCServer() {
+	// 数据库连接字符串
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%s&loc=%s",
+		constants.DBUser,
+		constants.DBPassword,
+		constants.DBHost,
+		constants.DBPort,
+		constants.DBName,
+		constants.DBCharset,
+		constants.DBParseTime,
+		constants.DBLoc,
+	)
 
-	// 初始化数据库连接
-	DB, err := config.InitDB()
+	// 连接到数据库
+	db, err := gorm.Open("mysql", dsn)
 	if err != nil {
-		logging.Logger.Fatalf("failed to initialize database: %v", err)
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+	defer db.Close()
+
+	// 启动 gRPC 服务器
+	lis, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
 	}
 
-	// 执行数据库自动迁移
-	migrations.AutoMigrate(DB)
+	s := grpc.NewServer()
+	auth.RegisterAuthServiceServer(s, &server.AuthServer{DB: db}) // 注册 gRPC 服务
 
-	// 将数据库连接赋值给服务
-	service.Db = DB
-	logging.Logger.Println("Database connection initialized:", service.Db)
-
-	// 初始化 Gin 路由
-	router := gin.Default()
-	Router.InitRouter(router)
-
-	// 启动 Gin 服务器
-	if err := router.Run(); err != nil {
-		logging.Logger.Fatalf("failed to run server: %v", err)
+	log.Println("gRPC Server listening on port 50051...")
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
 	}
+}
+
+// 启动 Gin HTTP 服务器
+func startHTTPServer() {
+	// 创建 Gin 路由
+	r := gin.Default()
+
+	// 创建 gRPC 客户端连接
+	conn, err := grpc.Dial(":50051", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	client := auth.NewAuthServiceClient(conn)
+
+	// 登录接口
+	r.POST("/login", func(c *gin.Context) {
+		req := &auth.LoginRequest{Username: "test", Password: "password123"}
+		resp, err := client.Login(c, req)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(200, resp)
+	})
+
+	// 启动 Gin HTTP 服务器
+	r.Run(":8080")
+}
+
+func main() {
+	// 启动 gRPC 和 HTTP 服务器
+	go startGRPCServer()
+	startHTTPServer()
 }

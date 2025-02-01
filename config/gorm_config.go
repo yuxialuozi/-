@@ -7,19 +7,32 @@ import (
 	"simpledouyin/constants"
 )
 
-func InitDB() (*gorm.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%s&loc=%s",
-		constants.DBUser,
-		constants.DBPassword,
-		constants.DBHost,
-		constants.DBPort,
-		constants.DBName,
-		constants.DBCharset,
-		constants.DBParseTime,
-		constants.DBLoc)
+// DBConfig 用于存储数据库连接配置
+type DBConfig struct {
+	User      string
+	Password  string
+	Host      string
+	Port      string
+	DBName    string
+	Charset   string
+	ParseTime string
+	Loc       string
+}
 
+func InitDB(config DBConfig) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%s&loc=%s",
+		config.User,
+		config.Password,
+		config.Host,
+		config.Port,
+		config.DBName,
+		config.Charset,
+		config.ParseTime,
+		config.Loc)
+
+	// 使用传递的配置初始化数据库连接
 	DB, err := gorm.Open(mysql.New(mysql.Config{
-		DSN:                       dsn,   // 使用定义好的 DSN
+		DSN:                       dsn,
 		DefaultStringSize:         256,   // string 类型字段的默认长度
 		DisableDatetimePrecision:  true,  // 禁用 datetime 精度，MySQL 5.6 之前的数据库不支持
 		DontSupportRenameIndex:    true,  // 重命名索引时采用删除并新建的方式，MySQL 5.7 之前的数据库和 MariaDB 不支持重命名索引
@@ -32,4 +45,18 @@ func InitDB() (*gorm.DB, error) {
 	}
 
 	return DB, nil
+}
+
+// GetDBConfig 返回格式化的数据库连接字符串
+func GetDBConfig() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%s&loc=%s",
+		constants.DBUser,
+		constants.DBPassword,
+		constants.DBHost,
+		constants.DBPort,
+		constants.DBName,
+		constants.DBCharset,
+		constants.DBParseTime,
+		constants.DBLoc,
+	)
 }
