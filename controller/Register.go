@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 )
 
@@ -12,7 +12,7 @@ var usersLoginInfo = map[string]uint{}
 
 func Register(c *gin.Context) {
 	//注册用户，第一条代码进行实例化
-	var author = role.Author{}
+	var author = model.Author{}
 
 	//获取信息
 	username := c.Query("username")

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 	"strconv"
 )
 
 func CommentList(c *gin.Context) {
-	var commentList []role.Comment
+	var commentList []model.Comment
 	token := c.Query("token")
 	videoId := c.Query("video_id")
 
@@ -20,15 +20,15 @@ func CommentList(c *gin.Context) {
 
 	var userId []uint
 
-	service.Db.Model(&role.Comment{}).Where("video_id = ?", videouintid).Order("id desc").Pluck("user_id", &userId)
+	service.Db.Model(&model.Comment{}).Where("video_id = ?", videouintid).Order("id desc").Pluck("user_id", &userId)
 	fmt.Println(userId)
 
-	service.Db.Model(&role.Comment{}).Where("video_id = ?", videouintid).Order("id desc").Find(&commentList)
+	service.Db.Model(&model.Comment{}).Where("video_id = ?", videouintid).Order("id desc").Find(&commentList)
 
 	for i := range userId {
-		var user role.Author
+		var user model.Author
 
-		service.Db.Model(&role.Author{}).Where("id = ?", userId[i]).Find(&user)
+		service.Db.Model(&model.Author{}).Where("id = ?", userId[i]).Find(&user)
 
 		commentList[i].User = user
 	}

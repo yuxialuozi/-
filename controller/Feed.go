@@ -3,7 +3,7 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 	"strconv"
 	"time"
@@ -20,7 +20,7 @@ var videoTime = map[int]uint{}
 
 func Feed(c *gin.Context) {
 	//实例化对象
-	var videolist role.VideoList
+	var videolist model.VideoList
 
 	fmt.Println("这个路径运行了一次")
 
@@ -30,7 +30,7 @@ func Feed(c *gin.Context) {
 
 	userID := usersLoginInfo[token]
 
-	var author role.Author
+	var author model.Author
 	service.Db.Where("id = ?", userID).Find(&author)
 
 	//获取这个时间戳的对象
@@ -66,9 +66,9 @@ func Feed(c *gin.Context) {
 	//遍历判断点赞，如果找到记录，说明点赞过了
 	for i := range videolist.VideoList {
 
-		var userLove role.UserLove
+		var userLove model.UserLove
 
-		userLove = role.UserLove{
+		userLove = model.UserLove{
 			UserId:  author.ID,
 			VideoId: videolist.VideoList[i].ID,
 		}

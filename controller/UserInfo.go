@@ -3,12 +3,12 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 )
 
 func UserInfo(c *gin.Context) {
-	var author = role.Author{}
+	var author = model.Author{}
 
 	//获得数据
 	userid := c.Query("user_id")

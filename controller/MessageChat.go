@@ -3,25 +3,25 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 )
 
 func MessageChat(c *gin.Context) {
-	var messageList []role.Message
+	var messageList []model.Message
 
 	token := c.Query("token")
 	toUserID := c.Query("to_user_id")
 
 	userID := usersLoginInfo[token]
 
-	var user role.Author
+	var user model.Author
 	service.Db.Where("id = ?", userID).Find(&user)
 
 	// 检查用户是否已登录
 	if _, exist := usersLoginInfo[token]; exist {
 		// 查询未被查看的消息记录，并按照创建时间降序排序
-		err := service.Db.Model(&role.Message{}).
+		err := service.Db.Model(&model.Message{}).
 			Where("((to_user_id = ? AND from_user_id = ?) OR (to_user_id = ? AND from_user_id = ?)) AND is_viewed = ?",
 				toUserID, user.ID, user.ID, toUserID, false).
 			Find(&messageList).Error

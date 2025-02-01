@@ -1,4 +1,4 @@
-package role
+package model
 
 type Video struct {
 	ID            uint   `json:"id" gorm:"primary_key"`             //视频唯一标识

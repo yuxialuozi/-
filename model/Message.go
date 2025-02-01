@@ -1,4 +1,4 @@
-package role
+package model
 
 type Message struct {
 	ID         uint   `json:"id" gorm:"primary_key" ` //主键id

@@ -9,7 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 	"strings"
 	"time"
@@ -18,7 +18,7 @@ import (
 func Publish(c *gin.Context) {
 
 	//video实例化
-	var video = role.Video{}
+	var video = model.Video{}
 
 	// 获得数据
 	data, _ := c.FormFile("data")
@@ -43,14 +43,14 @@ func Publish(c *gin.Context) {
 
 		userID := usersLoginInfo[token]
 
-		var author role.Author
+		var author model.Author
 		service.Db.Where("id = ?", userID).Find(&author)
 
 		// 增加作者的作品数量
 		author.WorkCount++
 
 		// 更新数据库中的作品数量
-		service.Db.Model(&role.Author{}).Where("name = ?", author.Name).Update("work_count", author.WorkCount)
+		service.Db.Model(&model.Author{}).Where("name = ?", author.Name).Update("work_count", author.WorkCount)
 
 		video.Title = title
 		video.Author = author

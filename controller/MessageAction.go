@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 	"strconv"
 	"time"
@@ -31,10 +31,10 @@ func MessageAction(c *gin.Context) {
 
 			userID := usersLoginInfo[token]
 
-			var user role.Author
+			var user model.Author
 			service.Db.Where("id = ?", userID).Find(&user)
 
-			message := role.Message{
+			message := model.Message{
 				ToUserID:   uint(toUserIdInt),
 				FromUserID: user.ID,
 				Content:    content,
@@ -42,7 +42,7 @@ func MessageAction(c *gin.Context) {
 				IsViewed:   true,
 			}
 
-			if err := service.Db.Model(&role.Message{}).Create(&message).Error; err != nil {
+			if err := service.Db.Model(&model.Message{}).Create(&message).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"status_code": 2,
 					"status_msg":  "发送失败",

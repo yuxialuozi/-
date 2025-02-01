@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 	"strconv"
 	"time"
@@ -11,7 +11,7 @@ import (
 
 func CommentAction(c *gin.Context) {
 
-	var video role.Video
+	var video model.Video
 	token := c.Query("token")
 	videoId := c.Query("video_id")
 	actionType := c.Query("action_type")
@@ -25,25 +25,25 @@ func CommentAction(c *gin.Context) {
 	// 获取评论用户信息
 	userID := usersLoginInfo[token]
 
-	var user role.Author
+	var user model.Author
 	service.Db.Where("id = ?", userID).Find(&user)
 
 	if _, exist := usersLoginInfo[token]; exist {
 		//1-发布评论，2-删除评论
 		if actionType == "1" {
 
-			var comment role.Comment
+			var comment model.Comment
 			comment.User = user
 			comment.UserID = user.ID
 			videouintid, _ := strconv.ParseUint(videoId, 10, 64)
 			comment.VideoID = uint(videouintid)
 
-			var video role.Video
-			service.Db.Model(&role.Video{}).Where("id = ?", videouintid).Find(&video)
+			var video model.Video
+			service.Db.Model(&model.Video{}).Where("id = ?", videouintid).Find(&video)
 
 			video.CommentCount++
 
-			service.Db.Model(&role.Video{}).Where("id = ?", videouintid).Update("comment_count", video.CommentCount)
+			service.Db.Model(&model.Video{}).Where("id = ?", videouintid).Update("comment_count", video.CommentCount)
 
 			comment.Video = video
 
@@ -54,7 +54,7 @@ func CommentAction(c *gin.Context) {
 
 			comment.CreateDate = dateString
 
-			service.Db.Model(&role.Comment{}).Create(&comment)
+			service.Db.Model(&model.Comment{}).Create(&comment)
 
 			c.JSON(http.StatusOK, gin.H{
 				"status_code": 0,
@@ -64,14 +64,14 @@ func CommentAction(c *gin.Context) {
 
 		} else if actionType == "2" {
 
-			var comment role.Comment
-			service.Db.Model(&role.Comment{}).Where("id = ?", commentId).Delete(&comment)
+			var comment model.Comment
+			service.Db.Model(&model.Comment{}).Where("id = ?", commentId).Delete(&comment)
 
 			videouintid, _ := strconv.ParseUint(videoId, 10, 64)
 			comment.VideoID = uint(videouintid)
 
 			video.CommentCount--
-			service.Db.Model(&role.Video{}).Where("id = ?", videouintid).Update("comment_count", video.CommentCount)
+			service.Db.Model(&model.Video{}).Where("id = ?", videouintid).Update("comment_count", video.CommentCount)
 
 			c.JSON(http.StatusOK, gin.H{
 				"status_code": 0,

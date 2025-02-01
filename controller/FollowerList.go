@@ -3,12 +3,12 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 )
 
 func FollowerList(c *gin.Context) {
-	var followerList []role.Author
+	var followerList []model.Author
 
 	userId := c.Query("user_id")
 	token := c.Query("token")
@@ -16,12 +16,12 @@ func FollowerList(c *gin.Context) {
 	if _, exist := usersLoginInfo[token]; exist {
 		var followerid []uint
 
-		service.Db.Model(&role.Relation{}).Where("to_user_id = ?", userId).Pluck("user_id", &followerid)
+		service.Db.Model(&model.Relation{}).Where("to_user_id = ?", userId).Pluck("user_id", &followerid)
 
 		for _, id := range followerid {
-			var follower role.Author
+			var follower model.Author
 
-			service.Db.Model(&role.Author{}).Where("id = ?", id).First(&follower)
+			service.Db.Model(&model.Author{}).Where("id = ?", id).First(&follower)
 
 			followerList = append(followerList, follower)
 		}

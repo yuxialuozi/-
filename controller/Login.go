@@ -3,12 +3,12 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 )
 
 func Login(c *gin.Context) {
-	var author = role.Author{}
+	var author = model.Author{}
 
 	//获取信息
 	username := c.Query("username")

@@ -3,14 +3,14 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 	"strconv"
 )
 
 func FavoriteAction(c *gin.Context) {
 
-	var video role.Video
+	var video model.Video
 	token := c.Query("token")
 	videoId := c.Query("video_id")
 	actionType := c.Query("action_type")
@@ -19,7 +19,7 @@ func FavoriteAction(c *gin.Context) {
 
 	userID := usersLoginInfo[token]
 
-	var user role.Author
+	var user model.Author
 	service.Db.Where("id = ?", userID).Find(&user)
 
 	if _, exist := usersLoginInfo[token]; exist {
@@ -33,10 +33,10 @@ func FavoriteAction(c *gin.Context) {
 			// 增加用户的喜欢作品数量
 			user.FavoriteCount++
 
-			var author = role.Author{}
+			var author = model.Author{}
 			var authorId uint
-			service.Db.Model(&role.Video{}).Where("id = ?", videoId).Pluck("author_id", &authorId)
-			service.Db.Model(&role.Author{}).Where("id = ?", authorId).Find(&author)
+			service.Db.Model(&model.Video{}).Where("id = ?", videoId).Pluck("author_id", &authorId)
+			service.Db.Model(&model.Author{}).Where("id = ?", authorId).Find(&author)
 
 			//增加作者的点赞数
 			intValue, _ := strconv.Atoi(author.TotalFavorited)
@@ -44,19 +44,19 @@ func FavoriteAction(c *gin.Context) {
 			stringValue := strconv.Itoa(intValue)
 
 			// 更新数据库中的喜欢的作品
-			service.Db.Model(&role.Author{}).Where("name = ?", user.Name).Update("favorite_count", user.FavoriteCount)
-			service.Db.Model(&role.Author{}).Where("name = ?", author.Name).Update("total_favorited", stringValue)
+			service.Db.Model(&model.Author{}).Where("name = ?", user.Name).Update("favorite_count", user.FavoriteCount)
+			service.Db.Model(&model.Author{}).Where("name = ?", author.Name).Update("total_favorited", stringValue)
 
-			service.Db.Model(&role.Video{}).Where("id = ?", videoId).Update("favorite_count", video.FavoriteCount)
+			service.Db.Model(&model.Video{}).Where("id = ?", videoId).Update("favorite_count", video.FavoriteCount)
 
-			var userLove role.UserLove
+			var userLove model.UserLove
 
-			userLove = role.UserLove{
+			userLove = model.UserLove{
 				UserId:  user.ID,
 				VideoId: video.ID,
 			}
 
-			service.Db.Model(&role.UserLove{}).Create(&userLove)
+			service.Db.Model(&model.UserLove{}).Create(&userLove)
 
 		} else if actionType == "2" {
 
@@ -66,10 +66,10 @@ func FavoriteAction(c *gin.Context) {
 			// 减少用户的喜欢作品数量
 			user.FavoriteCount--
 
-			var author = role.Author{}
+			var author = model.Author{}
 			var authorId uint
-			service.Db.Model(&role.Video{}).Where("id = ?", videoId).Pluck("author_id", &authorId)
-			service.Db.Model(&role.Author{}).Where("id = ?", authorId).Find(&author)
+			service.Db.Model(&model.Video{}).Where("id = ?", videoId).Pluck("author_id", &authorId)
+			service.Db.Model(&model.Author{}).Where("id = ?", authorId).Find(&author)
 
 			//减少作者的点赞数
 			intValue, _ := strconv.Atoi(author.TotalFavorited)
@@ -77,19 +77,19 @@ func FavoriteAction(c *gin.Context) {
 			stringValue := strconv.Itoa(intValue)
 
 			// 更新数据库中的作品数量
-			service.Db.Model(&role.Author{}).Where("name = ?", user.Name).Update("favorite_count", user.FavoriteCount)
-			service.Db.Model(&role.Author{}).Where("name = ?", author.Name).Update("total_favorited", stringValue)
+			service.Db.Model(&model.Author{}).Where("name = ?", user.Name).Update("favorite_count", user.FavoriteCount)
+			service.Db.Model(&model.Author{}).Where("name = ?", author.Name).Update("total_favorited", stringValue)
 
-			service.Db.Model(&role.Video{}).Where("id = ?", videoId).Update("favorite_count", video.FavoriteCount)
+			service.Db.Model(&model.Video{}).Where("id = ?", videoId).Update("favorite_count", video.FavoriteCount)
 
-			var userLove role.UserLove
+			var userLove model.UserLove
 
-			userLove = role.UserLove{
+			userLove = model.UserLove{
 				UserId:  user.ID,
 				VideoId: video.ID,
 			}
 
-			service.Db.Where("user_id = ? AND video_id = ?", userLove.UserId, userLove.VideoId).Delete(&role.UserLove{})
+			service.Db.Where("user_id = ? AND video_id = ?", userLove.UserId, userLove.VideoId).Delete(&model.UserLove{})
 
 		}
 

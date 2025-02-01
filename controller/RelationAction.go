@@ -5,26 +5,26 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 )
 
 func RelationAction(c *gin.Context) {
-	var toUser role.Author
+	var toUser model.Author
 
 	token := c.Query("token")
 	toUserId := c.Query("to_user_id")
 	actionType := c.Query("action_type")
 
 	//获取要关注的人
-	service.Db.Model(&role.Author{}).Where("id = ?", toUserId).Find(&toUser)
+	service.Db.Model(&model.Author{}).Where("id = ?", toUserId).Find(&toUser)
 
 	if _, exist := usersLoginInfo[token]; exist {
 		//1-关注，2-取消关注
 
 		userID := usersLoginInfo[token]
 
-		var user role.Author
+		var user model.Author
 		service.Db.Where("id = ?", userID).Find(&user)
 
 		if user.Name == toUser.Name {
@@ -35,7 +35,7 @@ func RelationAction(c *gin.Context) {
 			return
 		}
 
-		var relation role.Relation
+		var relation model.Relation
 		err := service.Db.Where("user_id = ? AND to_user_id = ?", user.ID, toUser.ID).First(&relation).Error
 
 		if err == nil {
@@ -50,7 +50,7 @@ func RelationAction(c *gin.Context) {
 				// 获取用户信息
 				userID := usersLoginInfo[token]
 
-				var user role.Author
+				var user model.Author
 
 				service.Db.Where("id = ?", userID).Find(&user)
 
@@ -61,23 +61,23 @@ func RelationAction(c *gin.Context) {
 				toUser.FollowerCount++
 
 				//更新和建立表关系
-				service.Db.Model(&role.Author{}).Where("name = ?", user.Name).Update("follow_count", user.FollowCount)
-				service.Db.Model(&role.Author{}).Where("name = ?", toUser.Name).Update("follower_count", toUser.FollowerCount)
+				service.Db.Model(&model.Author{}).Where("name = ?", user.Name).Update("follow_count", user.FollowCount)
+				service.Db.Model(&model.Author{}).Where("name = ?", toUser.Name).Update("follower_count", toUser.FollowerCount)
 
-				var relation role.Relation
-				relation = role.Relation{
+				var relation model.Relation
+				relation = model.Relation{
 					UserId:   user.ID,
 					ToUserId: toUser.ID,
 				}
 
-				service.Db.Model(&role.Relation{}).Create(&relation)
+				service.Db.Model(&model.Relation{}).Create(&relation)
 
 			} else if actionType == "2" {
 
 				//获得user
 				userID := usersLoginInfo[token]
 
-				var user role.Author
+				var user model.Author
 				service.Db.Where("id = ?", userID).Find(&user)
 
 				//减少这个user的关注数量
@@ -86,20 +86,20 @@ func RelationAction(c *gin.Context) {
 				// 减少关注人的被关注数量
 				toUser.FollowerCount--
 
-				var relation role.Relation
+				var relation model.Relation
 				relation.UserId = user.ID
 				relation.ToUserId = toUser.ID
 
 				//更新和建立表关系
-				service.Db.Model(&role.Video{}).Where("name = ?", user.Name).Update("follow_count", user.FollowCount)
-				service.Db.Model(&role.Author{}).Where("name = ?", toUser.Name).Update("follower_count", toUser.FollowerCount)
+				service.Db.Model(&model.Video{}).Where("name = ?", user.Name).Update("follow_count", user.FollowCount)
+				service.Db.Model(&model.Author{}).Where("name = ?", toUser.Name).Update("follower_count", toUser.FollowerCount)
 
-				relation = role.Relation{
+				relation = model.Relation{
 					UserId:   user.ID,
 					ToUserId: toUser.ID,
 				}
 
-				service.Db.Where("user_id = ? AND to_user_id = ?", relation.UserId, relation.ToUserId).Delete(&role.Relation{})
+				service.Db.Where("user_id = ? AND to_user_id = ?", relation.UserId, relation.ToUserId).Delete(&model.Relation{})
 
 			}
 

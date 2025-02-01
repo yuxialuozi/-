@@ -1,6 +1,5 @@
-package role
+package model
 
-// 用户的模型
 type Author struct {
 	ID              uint   `json:"id" gorm:"primary_key" `                                                               //用户id
 	Name            string `json:"name" gorm:"unique;not null"`                                                          //用户名称

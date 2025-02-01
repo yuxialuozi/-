@@ -3,14 +3,14 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"simpledouyin/role"
+	"simpledouyin/model"
 	"simpledouyin/service"
 )
 
 func PublishList(c *gin.Context) {
 	//实例化对象
-	var author = role.Author{}
-	var videolist role.VideoList
+	var author = model.Author{}
+	var videolist model.VideoList
 
 	//获取参数
 	token := c.Query("token")

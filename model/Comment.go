@@ -1,4 +1,4 @@
-package role
+package model
 
 type Comment struct {
 	ID         uint   `json:"id" gorm:"primary_key" ` //评论id

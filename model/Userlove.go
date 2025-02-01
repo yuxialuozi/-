@@ -1,4 +1,4 @@
-package role
+package model
 
 type UserLove struct {
 	ID      uint `json:"id" gorm:"primary_key" `
