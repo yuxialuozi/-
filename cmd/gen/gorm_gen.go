@@ -5,7 +5,7 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gorm"
 	"simpledouyin/config"
-	"simpledouyin/model"
+	"simpledouyin/repo/model"
 )
 
 // Querier Dynamic SQL
@@ -16,12 +16,11 @@ type Querier interface {
 
 func main() {
 	g := gen.NewGenerator(gen.Config{
-		OutPath: "dal",
+		OutPath: "repo",
 		Mode:    gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface, // generate mode
 	})
 
-	dsn := config.GetDBConfig()
-	gormdb, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	gormdb, _ := gorm.Open(mysql.Open(config.EnvConfig.GetDSN()))
 	g.UseDB(gormdb)
 
 	// Generate basic type-safe DAO API for struct `model.User` following conventions
