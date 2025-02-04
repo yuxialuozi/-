@@ -41,19 +41,18 @@ func (s *envConfigSchema) GetDSN() string {
 
 // 初始化默认配置值和环境变量加载
 func init() {
-	// 加载 .env 文件中的环境变量
-	envInit()
+	EnvConfig = defaultConfig
 
 	// 校验配置项
 	envValidate()
 
 	// 构建数据库连接字符串
-	dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
-		EnvConfig.MYSQL_HOST,
+	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
 		EnvConfig.MYSQL_USER,
 		EnvConfig.MYSQL_PASSWORD,
-		EnvConfig.MYSQL_DATABASE,
-		EnvConfig.MYSQL_PORT)
+		EnvConfig.MYSQL_HOST,
+		EnvConfig.MYSQL_PORT,
+		EnvConfig.MYSQL_DATABASE)
 }
 
 // 默认配置，若环境变量没有提供，将使用这些默认值
