@@ -1,0 +1,17 @@
+syntax = "proto3";
+package toktik.service.wechat.db;
+option go_package = "toktik/service/wechat/db";
+
+message ChatMessage {
+  uint32 from = 1;
+  uint32 to = 2;
+  string msg = 3;
+  int64 time = 4;
+}
+
+message ChatGPTMessage {
+  uint32 sender_id = 1;
+  string msg = 2;
+  bool reset_session = 3;
+  int64 time = 4;
+}

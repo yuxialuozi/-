@@ -45,6 +45,10 @@ type envConfigSchema struct {
 
 	UNSPLASH_ACCESS_KEY string
 	STORAGE_TYPE        string
+
+	REDIS_PASSWORD string
+	REDIS_DB       int
+	REDIS_ADDR     string
 }
 
 // 获取数据库连接字符串
