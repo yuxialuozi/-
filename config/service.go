@@ -1,5 +1,7 @@
 package config
 
+const IP = "172.21.176.1"
+
 const WebServiceName = "toktik-api-gateway"
 const WebServiceAddr = ":40126"
 

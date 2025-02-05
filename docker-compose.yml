@@ -1,0 +1,44 @@
+version: "3.7"
+
+services:
+  otel-collector:
+    build:
+      context: .  # 使用当前目录构建 Dockerfile
+    volumes:
+      - .//otel-collector-config.yaml:/etc/otel-collector-config.yaml # 使用正斜杠，并确保文件存在
+    ports:
+      - "1888:1888"
+      - "8888"
+      - "8889:8889"
+      - "13133:13133"
+      - "4317:4317"
+      - "55679"
+    depends_on:
+      - jaeger-all-in-one
+    networks:
+      - otel-network
+
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "14250:14250"
+      - "14267:14267"
+      - "14268:14268"
+      - "5775:5775"
+    networks:
+      - otel-network
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics
+    ports:
+      - "8428:8428"
+    networks:
+      - otel-network
+
+networks:
+  otel-network:
+    driver: bridge

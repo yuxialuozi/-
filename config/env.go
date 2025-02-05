@@ -32,6 +32,19 @@ type envConfigSchema struct {
 	REDIS_PORT            string
 	REDIS_DATABASE        string
 	MAX_REQUEST_BODY_SIZE int
+
+	LOCAL_FS_LOCATION string
+	LOCAL_FS_BASEURL  string
+
+	S3_ENDPOINT_URL string
+	S3_PUBLIC_URL   string
+	S3_BUCKET       string
+	S3_SECRET_ID    string
+	S3_SECRET_KEY   string
+	S3_PATH_STYLE   string
+
+	UNSPLASH_ACCESS_KEY string
+	STORAGE_TYPE        string
 }
 
 // 获取数据库连接字符串
@@ -71,6 +84,20 @@ var defaultConfig = envConfigSchema{
 	CONSUL_ADDR:     "127.0.0.1:8500",
 
 	MAX_REQUEST_BODY_SIZE: 200 * 1024 * 1024,
+
+	LOCAL_FS_LOCATION: "/tmp",
+	LOCAL_FS_BASEURL:  "http://localhost/",
+
+	STORAGE_TYPE: "s3",
+
+	S3_ENDPOINT_URL: "http://localhost:9000",
+	S3_PUBLIC_URL:   "http://localhost:9000",
+	S3_BUCKET:       "bucket",
+	S3_SECRET_ID:    "minio",
+	S3_SECRET_KEY:   "12345678",
+	S3_PATH_STYLE:   "true",
+
+	UNSPLASH_ACCESS_KEY: "access_key",
 }
 
 func envInit() {
