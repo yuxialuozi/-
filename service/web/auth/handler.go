@@ -70,3 +70,34 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	}).Debugf("Register success")
 	c.JSON(httpStatus.StatusOK, registerResponse)
 }
+
+func Login(ctx context.Context, c *app.RequestContext) {
+	methodFields := logrus.Fields{
+		"method": "Login",
+	}
+	logger := logging.Logger.WithFields(methodFields)
+	logger.Debugf("Process start")
+
+	username, usernameExist := c.GetQuery("username")
+	password, passwordExist := c.GetQuery("password")
+	if !usernameExist || !passwordExist {
+		bizConstant.NoUserNameOrPassWord.WithFields(&methodFields).LaunchError(c)
+		return
+	}
+	logger.WithFields(logrus.Fields{
+		"username": username,
+		"password": password,
+	}).Debugf("Executing login")
+	loginResponse, err := Client.Login(ctx, &auth.LoginRequest{
+		Username: username,
+		Password: password,
+	})
+	if err != nil {
+		bizConstant.RPCCallError.WithCause(err).WithFields(&methodFields).LaunchError(c)
+		return
+	}
+	logger.WithFields(logrus.Fields{
+		"response": loginResponse,
+	}).Debugf("Login success")
+	c.JSON(httpStatus.StatusOK, loginResponse)
+}
